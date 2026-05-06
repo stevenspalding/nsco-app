@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
       <div [ngClass]="getCardClasses()" class="bg-gradient-to-br p-5 rounded-2xl shadow-md text-white transition-all duration-300 relative overflow-hidden">
 
         <!-- Background loading pulse -->
-        <div *ngIf="isLoading && !info.remainingBalance" class="absolute inset-0 bg-white/10 animate-pulse"></div>
+        <div *ngIf="isLoading && info.remainingBalance == null" class="absolute inset-0 bg-white/10 animate-pulse"></div>
 
         <div class="flex justify-between items-start mb-1 relative z-10">
           <p class="text-white/90 text-sm font-semibold uppercase tracking-wider">Current Balance</p>
@@ -33,107 +33,145 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <p class="text-4xl font-black mb-2 tracking-tight relative z-10">
-          <span *ngIf="!info.remainingBalance && isLoading" class="inline-block w-32 h-10 bg-white/20 rounded-lg animate-pulse"></span>
-          <span *ngIf="info.remainingBalance">৳{{ info.remainingBalance }}</span>
+          <span *ngIf="isLoading && info.remainingBalance == null" class="inline-block w-32 h-10 bg-white/20 rounded-lg animate-pulse mt-1"></span>
+          <span *ngIf="info.remainingBalance != null">৳{{ info.remainingBalance }}</span>
         </p>
 
         <p class="text-xs text-white/80 flex items-center font-medium relative z-10">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Updated: {{ info.balanceUpdateTime || 'Fetching...' }}
+          <span *ngIf="isLoading && !info.balanceUpdateTime" class="inline-block w-24 h-3 bg-white/20 rounded animate-pulse ml-1"></span>
+          <span *ngIf="!isLoading || info.balanceUpdateTime">Updated: {{ info.balanceUpdateTime || 'Unknown' }}</span>
         </p>
       </div>
 
-      <!-- Customer Details -->
+      <!-- Customer Details (Itemized Skeletons) -->
       <div class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
         <h3 class="text-lg font-bold text-[var(--tg-theme-text-color,#111827)] border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] pb-2 mb-3">Customer Info</h3>
 
         <div>
           <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Customer Name</p>
-          <p class="font-bold text-lg text-[var(--tg-theme-text-color,#111827)]">{{ info.customerName || (isLoading ? 'Loading...' : 'N/A') }}</p>
+          <div *ngIf="isLoading && !info.customerName" class="h-6 w-3/4 bg-black/10 dark:bg-white/10 rounded-md animate-pulse"></div>
+          <p *ngIf="!isLoading || info.customerName" class="font-bold text-lg text-[var(--tg-theme-text-color,#111827)]">{{ info.customerName || 'N/A' }}</p>
         </div>
 
         <div class="flex justify-between">
-          <div class="pr-2">
+          <div class="pr-2 w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Father/Husband</p>
-            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.fatherOrHusbandName || (isLoading ? 'Loading...' : 'N/A') }}</p>
+            <div *ngIf="isLoading && !info.fatherOrHusbandName" class="h-5 w-4/5 bg-black/10 dark:bg-white/10 rounded-md animate-pulse"></div>
+            <p *ngIf="!isLoading || info.fatherOrHusbandName" class="font-semibold text-[var(--tg-theme-text-color,#111827)] truncate">{{ info.fatherOrHusbandName || 'N/A' }}</p>
           </div>
-          <div class="text-right pl-2">
+          <div class="text-right pl-2 w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Mobile</p>
-            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.mobile || (isLoading ? 'Loading...' : 'N/A') }}</p>
+            <div *ngIf="isLoading && !info.mobile" class="h-5 w-3/4 ml-auto bg-black/10 dark:bg-white/10 rounded-md animate-pulse"></div>
+            <p *ngIf="!isLoading || info.mobile" class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.mobile || 'N/A' }}</p>
           </div>
         </div>
 
         <div>
           <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Address</p>
-          <p class="font-medium text-sm leading-relaxed text-[var(--tg-theme-text-color,#111827)]">{{ info.address || (isLoading ? 'Loading...' : 'N/A') }}</p>
+          <div *ngIf="isLoading && !info.address" class="space-y-1.5 mt-1">
+            <div class="h-4 w-full bg-black/10 dark:bg-white/10 rounded animate-pulse"></div>
+            <div class="h-4 w-5/6 bg-black/10 dark:bg-white/10 rounded animate-pulse"></div>
+          </div>
+          <p *ngIf="!isLoading || info.address" class="font-medium text-sm leading-relaxed text-[var(--tg-theme-text-color,#111827)]">{{ info.address || 'N/A' }}</p>
         </div>
       </div>
 
-      <!-- Meter Details -->
-      <div class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
+      <!-- Meter Details Skeleton Card -->
+      <div *ngIf="isLoading && !info.consumerNo" class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm animate-pulse space-y-5">
+        <div class="h-5 w-32 bg-black/10 dark:bg-white/10 rounded-md"></div>
+        <div class="space-y-4">
+          <div class="flex justify-between space-x-4">
+            <div class="space-y-1.5 w-1/2"><div class="h-3 w-1/2 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-3/4 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+            <div class="space-y-1.5 w-1/2 flex flex-col items-end"><div class="h-3 w-1/2 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-4/5 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+          </div>
+          <div class="flex justify-between space-x-4">
+            <div class="space-y-1.5 w-1/2"><div class="h-3 w-1/2 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-2/3 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+            <div class="space-y-1.5 w-1/2 flex flex-col items-end"><div class="h-3 w-1/2 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-3/4 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+          </div>
+          <div class="flex justify-between space-x-4">
+            <div class="space-y-1.5 w-1/2"><div class="h-3 w-1/2 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-1/2 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+            <div class="space-y-1.5 w-1/2 flex flex-col items-end"><div class="h-3 w-1/2 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-1/3 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meter Details Loaded Card -->
+      <div *ngIf="!isLoading || info.consumerNo" class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
         <h3 class="text-lg font-bold text-[var(--tg-theme-text-color,#111827)] border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] pb-2 mb-3">Meter Info</h3>
 
         <div class="flex justify-between">
-          <div>
+          <div class="w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Consumer No</p>
-            <p class="font-bold font-mono text-[var(--tg-theme-text-color,#111827)]">{{ info.consumerNo || (isLoading ? '...' : 'N/A') }}</p>
+            <p class="font-bold font-mono text-[var(--tg-theme-text-color,#111827)]">{{ info.consumerNo || 'N/A' }}</p>
           </div>
-          <div class="text-right">
+          <div class="text-right w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Meter No</p>
-            <p class="font-bold font-mono text-[var(--tg-theme-text-color,#111827)]">{{ info.meterNo || (isLoading ? '...' : 'N/A') }}</p>
+            <p class="font-bold font-mono text-[var(--tg-theme-text-color,#111827)]">{{ info.meterNo || 'N/A' }}</p>
           </div>
         </div>
 
         <div class="flex justify-between">
-          <div>
+          <div class="w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Meter Status</p>
-            <p class="font-bold" [ngClass]="(info.meterStatus || info.status) === 'Active' ? 'text-green-500' : (isLoading ? 'text-[var(--tg-theme-hint-color,#6b7280)]' : 'text-red-500')">
-              {{ info.meterStatus || info.status || (isLoading ? 'Loading...' : 'N/A') }}
+            <p class="font-bold" [ngClass]="(info.meterStatus || info.status) === 'Active' ? 'text-green-500' : 'text-red-500'">
+              {{ info.meterStatus || info.status || 'N/A' }}
             </p>
           </div>
-          <div class="text-right">
+          <div class="text-right w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Meter Type</p>
-            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.meterType || (isLoading ? 'Loading...' : 'N/A') }}</p>
+            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.meterType || 'N/A' }}</p>
           </div>
         </div>
 
         <div class="flex justify-between">
-          <div>
+          <div class="w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Tariff</p>
-            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.tariff || (isLoading ? '...' : 'N/A') }}</p>
+            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.tariff || 'N/A' }}</p>
           </div>
-          <div class="text-right">
+          <div class="text-right w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Sanctioned Load</p>
-            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.sanctionedLoadKw || info.sanctionedLoad || (isLoading ? '...' : 'N/A') }}</p>
+            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.sanctionedLoadKw || info.sanctionedLoad || 'N/A' }}</p>
           </div>
         </div>
 
         <div class="flex justify-between">
-          <div>
+          <div class="w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Install Date</p>
-            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.meterInstallDate || (isLoading ? 'Loading...' : 'N/A') }}</p>
+            <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.meterInstallDate || 'N/A' }}</p>
           </div>
-          <div class="text-right">
+          <div class="text-right w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Min Recharge</p>
-            <p class="font-bold text-[var(--tg-theme-button-color,#3b82f6)]">{{ info.minimumRechargeAmount !== undefined ? '৳' + info.minimumRechargeAmount : (isLoading ? '...' : 'N/A') }}</p>
+            <p class="font-bold text-[var(--tg-theme-button-color,#3b82f6)]">
+              {{ info.minimumRechargeAmount !== undefined ? '৳' + info.minimumRechargeAmount : 'N/A' }}
+            </p>
           </div>
         </div>
       </div>
 
-      <!-- Office Details -->
-      <div class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
+      <!-- Office Details Skeleton Card -->
+      <div *ngIf="isLoading && !info.sndOffice" class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm animate-pulse space-y-5">
+        <div class="h-5 w-24 bg-black/10 dark:bg-white/10 rounded-md"></div>
+        <div class="space-y-4">
+          <div class="space-y-1.5"><div class="h-3 w-1/4 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-3/4 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+          <div class="space-y-1.5"><div class="h-3 w-1/4 bg-black/10 dark:bg-white/10 rounded"></div><div class="h-5 w-1/2 bg-black/10 dark:bg-white/10 rounded-md"></div></div>
+        </div>
+      </div>
+
+      <!-- Office Details Loaded Card -->
+      <div *ngIf="!isLoading || info.sndOffice" class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
         <h3 class="text-lg font-bold text-[var(--tg-theme-text-color,#111827)] border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] pb-2 mb-3">Office Info</h3>
 
         <div>
           <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">SND Office</p>
-          <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.sndOffice || (isLoading ? 'Loading...' : 'N/A') }}</p>
+          <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.sndOffice || 'N/A' }}</p>
         </div>
 
         <div>
           <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Feeder Name</p>
-          <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.feederName || (isLoading ? 'Loading...' : 'N/A') }}</p>
+          <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.feederName || 'N/A' }}</p>
         </div>
       </div>
 
@@ -149,7 +187,7 @@ export class MeterInfoComponent {
   }
 
   getBalanceState(): 'normal' | 'low' | 'negative' {
-    if (this.info?.remainingBalance === undefined) return 'normal';
+    if (this.info?.remainingBalance === undefined || this.info?.remainingBalance === null) return 'normal';
     const bal = this.getBalanceAmount();
     if (bal < 0) return 'negative';
     if (bal <= 100) return 'low';
