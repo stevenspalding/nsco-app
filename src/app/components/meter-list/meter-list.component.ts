@@ -16,20 +16,23 @@ declare global { interface Window { Telegram: any; } }
       <!-- Header -->
       <div class="flex justify-between items-center mb-6 mt-2">
         <h1 class="text-3xl font-bold">My Meters</h1>
-        <div class="flex items-center space-x-1">
-          <!-- Settings Button -->
-          <button (click)="openSettingsModal()" class="p-2 text-[var(--tg-theme-button-color,#3b82f6)] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </button>
+        <div class="flex items-center space-x-3">
+
           <!-- Refresh Button -->
           <button (click)="fetchList(true)" [disabled]="loading" class="p-2 text-[var(--tg-theme-button-color,#3b82f6)] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors active:scale-95 disabled:opacity-50">
             <svg [class.animate-spin]="loading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
+
+          <!-- Profile Button (Dynamic Avatar) -->
+          <button (click)="openProfile()" class="h-10 w-10 rounded-full bg-gradient-to-tr from-[var(--tg-theme-button-color,#3b82f6)] to-blue-400 p-[2px] transition-transform active:scale-95 shadow-sm">
+            <div class="w-full h-full rounded-full border-2 border-[var(--tg-theme-bg-color,#ffffff)] bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] flex items-center justify-center text-[var(--tg-theme-button-color,#3b82f6)] text-sm font-bold overflow-hidden">
+              <img *ngIf="tgUser?.photo_url" [src]="tgUser.photo_url" class="w-full h-full object-cover">
+              <span *ngIf="!tgUser?.photo_url">{{ initials || '👤' }}</span>
+            </div>
+          </button>
+
         </div>
       </div>
 
@@ -81,46 +84,6 @@ declare global { interface Window { Telegram: any; } }
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
         </svg>
       </button>
-
-      <!-- Settings Modal -->
-      <div *ngIf="showSettingsModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
-        <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-slide-up sm:animate-fade-in pb-safe border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-[var(--tg-theme-text-color,#111827)]">Settings</h3>
-            <button (click)="closeSettingsModal()" class="p-1.5 rounded-full bg-[var(--tg-theme-secondary-bg-color,#e5e7eb)] text-[var(--tg-theme-hint-color,#6b7280)] hover:text-red-500 active:scale-95 transition-all">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="space-y-4 mb-2">
-            <!-- Daily Notifications Toggle -->
-            <div class="flex items-center justify-between p-4 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
-              <div class="pr-4">
-                <p class="font-bold text-[var(--tg-theme-text-color,#111827)] text-sm">Daily Notifications</p>
-                <p class="text-[11px] text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5 leading-tight">Receive Telegram messages when balance updates.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" [checked]="settings.dailyUpdates" (change)="toggleSetting('dailyUpdates', $event)" [disabled]="isSavingSettings" class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--tg-theme-button-color,#3b82f6)]"></div>
-              </label>
-            </div>
-
-            <!-- Low Balance Alerts Toggle -->
-            <div class="flex items-center justify-between p-4 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
-              <div class="pr-4">
-                <p class="font-bold text-[var(--tg-theme-text-color,#111827)] text-sm">Low Balance Alerts</p>
-                <p class="text-[11px] text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5 leading-tight">Get emergency pings when balance is critically low.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" [checked]="settings.lowBalanceAlerts" (change)="toggleSetting('lowBalanceAlerts', $event)" [disabled]="isSavingSettings" class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--tg-theme-button-color,#3b82f6)]"></div>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Add Meter Modal -->
       <div *ngIf="showAddModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
@@ -178,10 +141,9 @@ export class MeterListComponent implements OnInit {
   isAdding = false;
   addError = '';
 
-  showSettingsModal = false;
-  isSavingSettings = false;
-
   private tg = (window as any).Telegram?.WebApp;
+  tgUser = this.tg?.initDataUnsafe?.user || {};
+  initials = (this.tgUser.first_name?.[0] || '') + (this.tgUser.last_name?.[0] || '');
 
   constructor(
     private apiService: ApiService,
@@ -219,32 +181,9 @@ export class MeterListComponent implements OnInit {
     this.router.navigate(['/meter', acc.id], { state: { meterData: acc } });
   }
 
-  openSettingsModal() {
+  openProfile() {
     if (this.tg?.HapticFeedback) this.tg.HapticFeedback.selectionChanged();
-    this.showSettingsModal = true;
-  }
-
-  closeSettingsModal() {
-    this.showSettingsModal = false;
-  }
-
-  toggleSetting(key: string, event: any) {
-    const originalValue = this.settings[key];
-    this.settings[key] = event.target.checked;
-    this.isSavingSettings = true;
-
-    this.apiService.updateSettings(this.settings).subscribe({
-      next: () => {
-        this.isSavingSettings = false;
-        this.apiService.clearCache();
-        if (this.tg?.HapticFeedback) this.tg.HapticFeedback.notificationOccurred('success');
-      },
-      error: () => {
-        this.isSavingSettings = false;
-        this.settings[key] = originalValue;
-        if (this.tg?.showAlert) this.tg.showAlert('Failed to save settings.');
-      }
-    });
+    this.router.navigate(['/profile'], { state: { settings: this.settings, count: this.accounts.length } });
   }
 
   openAddModal() {
