@@ -95,13 +95,26 @@ declare global { interface Window { Telegram: any; } }
           </div>
 
           <div class="space-y-4 mb-2">
+            <!-- Daily Notifications Toggle -->
             <div class="flex items-center justify-between p-4 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
               <div class="pr-4">
                 <p class="font-bold text-[var(--tg-theme-text-color,#111827)] text-sm">Daily Notifications</p>
                 <p class="text-[11px] text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5 leading-tight">Receive Telegram messages when balance updates.</p>
               </div>
               <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" [checked]="settings.dailyUpdates" (change)="toggleDailyUpdates($event)" [disabled]="isSavingSettings" class="sr-only peer">
+                <input type="checkbox" [checked]="settings.dailyUpdates" (change)="toggleSetting('dailyUpdates', $event)" [disabled]="isSavingSettings" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--tg-theme-button-color,#3b82f6)]"></div>
+              </label>
+            </div>
+
+            <!-- Low Balance Alerts Toggle -->
+            <div class="flex items-center justify-between p-4 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
+              <div class="pr-4">
+                <p class="font-bold text-[var(--tg-theme-text-color,#111827)] text-sm">Low Balance Alerts</p>
+                <p class="text-[11px] text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5 leading-tight">Get emergency pings when balance is critically low.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                <input type="checkbox" [checked]="settings.lowBalanceAlerts" (change)="toggleSetting('lowBalanceAlerts', $event)" [disabled]="isSavingSettings" class="sr-only peer">
                 <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--tg-theme-button-color,#3b82f6)]"></div>
               </label>
             </div>
@@ -157,7 +170,7 @@ declare global { interface Window { Telegram: any; } }
 })
 export class MeterListComponent implements OnInit {
   accounts: any[] = [];
-  settings: any = { dailyUpdates: true };
+  settings: any = { dailyUpdates: true, lowBalanceAlerts: true };
   loading = true;
 
   showAddModal = false;
@@ -215,19 +228,20 @@ export class MeterListComponent implements OnInit {
     this.showSettingsModal = false;
   }
 
-  toggleDailyUpdates(event: any) {
-    this.settings.dailyUpdates = event.target.checked;
+  toggleSetting(key: string, event: any) {
+    const originalValue = this.settings[key];
+    this.settings[key] = event.target.checked;
     this.isSavingSettings = true;
 
     this.apiService.updateSettings(this.settings).subscribe({
       next: () => {
         this.isSavingSettings = false;
-        this.apiService.clearCache(); // Force cache invalidation to remember settings
+        this.apiService.clearCache();
         if (this.tg?.HapticFeedback) this.tg.HapticFeedback.notificationOccurred('success');
       },
       error: () => {
         this.isSavingSettings = false;
-        this.settings.dailyUpdates = !this.settings.dailyUpdates; // Revert UI
+        this.settings[key] = originalValue;
         if (this.tg?.showAlert) this.tg.showAlert('Failed to save settings.');
       }
     });
