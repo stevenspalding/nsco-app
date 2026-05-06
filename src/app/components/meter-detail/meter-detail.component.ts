@@ -100,7 +100,7 @@ declare global { interface Window { Telegram: any; } }
         <app-meter-info *ngIf="activeTab === 'info'" [info]="deepData.info" [isLoading]="loadingLive"></app-meter-info>
         <app-meter-daily *ngIf="activeTab === 'daily'" [dailyHistory]="deepData.dailyHistory" [isLoading]="loadingLive"></app-meter-daily>
         <app-meter-recharges *ngIf="activeTab === 'recharges'" [recharges]="deepData.recharges" [isLoading]="loadingLive"></app-meter-recharges>
-        <app-meter-monthly *ngIf="activeTab === 'monthly'" [monthlyData]="monthlyUsageData" [loading]="loadingMonthly"></app-meter-monthly>
+        <app-meter-monthly *ngIf="activeTab === 'monthly'" [monthlyUsage]="monthlyUsageData" [isLoading]="loadingMonthly"></app-meter-monthly>
       </div>
     </div>
 
