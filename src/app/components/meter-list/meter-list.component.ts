@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 
 declare global { interface Window { Telegram: any; } }
@@ -8,18 +9,28 @@ declare global { interface Window { Telegram: any; } }
 @Component({
   selector: 'app-meter-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="fixed inset-0 overflow-y-auto p-4 pb-20 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] font-sans">
 
       <!-- Header -->
       <div class="flex justify-between items-center mb-6 mt-2">
         <h1 class="text-3xl font-bold">My Meters</h1>
-        <button (click)="fetchList(true)" [disabled]="loading" class="p-2 text-[var(--tg-theme-button-color,#3b82f6)] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors active:scale-95 disabled:opacity-50">
-          <svg [class.animate-spin]="loading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
+        <div class="flex items-center space-x-1">
+          <!-- Settings Button -->
+          <button (click)="openSettingsModal()" class="p-2 text-[var(--tg-theme-button-color,#3b82f6)] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+          <!-- Refresh Button -->
+          <button (click)="fetchList(true)" [disabled]="loading" class="p-2 text-[var(--tg-theme-button-color,#3b82f6)] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors active:scale-95 disabled:opacity-50">
+            <svg [class.animate-spin]="loading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -35,7 +46,6 @@ declare global { interface Window { Telegram: any; } }
 
       <!-- Meter List -->
       <div *ngIf="accounts.length > 0" class="space-y-4">
-        <!-- Passing the entire 'acc' object via the click handler -->
         <div *ngFor="let acc of accounts"
              (click)="selectMeter(acc)"
              class="rounded-2xl p-5 shadow-sm bg-[var(--tg-theme-bg-color,#ffffff)] border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] cursor-pointer hover:shadow-md active:scale-[0.98] transition-all">
@@ -72,9 +82,36 @@ declare global { interface Window { Telegram: any; } }
         </svg>
       </button>
 
+      <!-- Settings Modal -->
+      <div *ngIf="showSettingsModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-slide-up sm:animate-fade-in pb-safe border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-[var(--tg-theme-text-color,#111827)]">Settings</h3>
+            <button (click)="closeSettingsModal()" class="p-1.5 rounded-full bg-[var(--tg-theme-secondary-bg-color,#e5e7eb)] text-[var(--tg-theme-hint-color,#6b7280)] hover:text-red-500 active:scale-95 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-4 mb-2">
+            <div class="flex items-center justify-between p-4 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
+              <div class="pr-4">
+                <p class="font-bold text-[var(--tg-theme-text-color,#111827)] text-sm">Daily Notifications</p>
+                <p class="text-[11px] text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5 leading-tight">Receive Telegram messages when balance updates.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                <input type="checkbox" [checked]="settings.dailyUpdates" (change)="toggleDailyUpdates($event)" [disabled]="isSavingSettings" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--tg-theme-button-color,#3b82f6)]"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Add Meter Modal -->
-      <div *ngIf="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm transition-opacity">
-        <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+      <div *ngIf="showAddModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-slide-up sm:animate-fade-in pb-safe">
           <h3 class="text-2xl font-bold text-[var(--tg-theme-text-color,#111827)] mb-2">Add Meter</h3>
           <p class="text-sm text-[var(--tg-theme-hint-color,#6b7280)] mb-5">Enter your NESCO Consumer ID to start tracking.</p>
 
@@ -109,16 +146,27 @@ declare global { interface Window { Telegram: any; } }
         </div>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .animate-fade-in { animation: fadeIn 0.2s ease-out; }
+    .pb-safe { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+  `]
 })
 export class MeterListComponent implements OnInit {
   accounts: any[] = [];
+  settings: any = { dailyUpdates: true };
   loading = true;
 
   showAddModal = false;
   newMeterId = '';
   isAdding = false;
   addError = '';
+
+  showSettingsModal = false;
+  isSavingSettings = false;
 
   private tg = (window as any).Telegram?.WebApp;
 
@@ -139,6 +187,8 @@ export class MeterListComponent implements OnInit {
     this.apiService.getList(forceRefresh).subscribe({
       next: (res: any) => {
         this.accounts = res.accounts;
+        if (res.settings) this.settings = res.settings;
+
         this.loading = false;
         if (forceRefresh && this.tg?.HapticFeedback) {
           this.tg.HapticFeedback.impactOccurred('light');
@@ -153,8 +203,34 @@ export class MeterListComponent implements OnInit {
 
   selectMeter(acc: any) {
     if (this.tg?.HapticFeedback) this.tg.HapticFeedback.selectionChanged();
-    // Pass the initial meter data safely via router state
     this.router.navigate(['/meter', acc.id], { state: { meterData: acc } });
+  }
+
+  openSettingsModal() {
+    if (this.tg?.HapticFeedback) this.tg.HapticFeedback.selectionChanged();
+    this.showSettingsModal = true;
+  }
+
+  closeSettingsModal() {
+    this.showSettingsModal = false;
+  }
+
+  toggleDailyUpdates(event: any) {
+    this.settings.dailyUpdates = event.target.checked;
+    this.isSavingSettings = true;
+
+    this.apiService.updateSettings(this.settings).subscribe({
+      next: () => {
+        this.isSavingSettings = false;
+        this.apiService.clearCache(); // Force cache invalidation to remember settings
+        if (this.tg?.HapticFeedback) this.tg.HapticFeedback.notificationOccurred('success');
+      },
+      error: () => {
+        this.isSavingSettings = false;
+        this.settings.dailyUpdates = !this.settings.dailyUpdates; // Revert UI
+        if (this.tg?.showAlert) this.tg.showAlert('Failed to save settings.');
+      }
+    });
   }
 
   openAddModal() {

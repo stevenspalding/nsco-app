@@ -33,6 +33,10 @@ export class ApiService {
     this.cachedList = null;
   }
 
+  updateSettings(settings: any): Observable<any> {
+    return this.http.post(this.apiUrl, { initData: this.initData, action: 'updateSettings', settings });
+  }
+
   getDetails(targetId: string): Observable<any> {
     return this.http.post(this.apiUrl, { initData: this.initData, action: 'details', targetId });
   }
