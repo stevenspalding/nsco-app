@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom background to match Telegram's native theme dynamically */
+body {
+  background-color: var(--tg-theme-secondary-bg-color, #f3f4f6);
+  color: var(--tg-theme-text-color, #111827);
+}
