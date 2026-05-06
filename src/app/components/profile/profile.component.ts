@@ -10,10 +10,10 @@ declare global { interface Window { Telegram: any; } }
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed inset-0 overflow-y-auto p-4 pb-20 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] font-sans">
+    <div class="fixed inset-0 overflow-y-auto p-4 pb-10 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] font-sans flex flex-col">
 
       <!-- Header -->
-      <div class="flex items-center mb-8 mt-2 relative">
+      <div class="flex items-center mb-8 mt-2 relative shrink-0">
         <button (click)="goBack()" class="absolute left-0 p-2 -ml-2 text-[var(--tg-theme-button-color,#3b82f6)] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors active:scale-95">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
@@ -23,7 +23,7 @@ declare global { interface Window { Telegram: any; } }
       </div>
 
       <!-- Profile Identity Card -->
-      <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-3xl p-8 shadow-sm border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] flex flex-col items-center text-center mb-8 relative overflow-hidden">
+      <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-3xl p-8 shadow-sm border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] flex flex-col items-center text-center mb-8 relative overflow-hidden shrink-0">
 
         <!-- Decorative background blobs -->
         <div class="absolute -top-10 -right-10 w-32 h-32 bg-[var(--tg-theme-button-color,#3b82f6)] opacity-10 rounded-full blur-2xl"></div>
@@ -56,9 +56,9 @@ declare global { interface Window { Telegram: any; } }
       </div>
 
       <!-- Preferences Section -->
-      <h3 class="text-[var(--tg-theme-hint-color,#6b7280)] font-bold uppercase tracking-wider text-xs ml-4 mb-3">Alert Preferences</h3>
+      <h3 class="text-[var(--tg-theme-hint-color,#6b7280)] font-bold uppercase tracking-wider text-xs ml-4 mb-3 shrink-0">Alert Preferences</h3>
 
-      <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-3xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm overflow-hidden mb-6">
+      <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-3xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm overflow-hidden shrink-0">
 
         <!-- Daily Notifications Toggle -->
         <div class="flex items-center justify-between p-5 border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
@@ -83,8 +83,15 @@ declare global { interface Window { Telegram: any; } }
             <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--tg-theme-button-color,#3b82f6)]"></div>
           </label>
         </div>
-
       </div>
+
+      <!-- Footer -->
+      <div class="mt-auto pt-10 text-center shrink-0">
+        <p class="text-[11px] font-bold tracking-widest text-[var(--tg-theme-hint-color,#6b7280)] opacity-40 uppercase">
+          Developed with ❤️ by Nomaan
+        </p>
+      </div>
+
     </div>
   `
 })
@@ -106,13 +113,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    // Show Telegram Native Back Button
     if (this.tg?.BackButton) {
       this.tg.BackButton.show();
       this.tg.BackButton.onClick(this.backButtonHandler);
     }
 
-    // Load state passed from MeterList, or fetch if refreshed
     const state = history.state;
     if (state && state.settings) {
       this.settings = state.settings;
@@ -150,7 +155,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isSavingSettings = false;
-        this.settings[key] = originalValue; // Revert UI visually
+        this.settings[key] = originalValue;
         if (this.tg?.showAlert) this.tg.showAlert('Failed to save settings.');
       }
     });

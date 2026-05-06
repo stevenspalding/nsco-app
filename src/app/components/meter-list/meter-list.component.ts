@@ -11,10 +11,10 @@ declare global { interface Window { Telegram: any; } }
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="fixed inset-0 overflow-y-auto p-4 pb-20 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] font-sans">
+    <div class="fixed inset-0 overflow-y-auto p-4 pb-20 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] font-sans flex flex-col">
 
       <!-- Header -->
-      <div class="flex justify-between items-center mb-6 mt-2">
+      <div class="flex justify-between items-center mb-6 mt-2 shrink-0">
         <h1 class="text-3xl font-bold">My Meters</h1>
         <div class="flex items-center space-x-3">
 
@@ -37,18 +37,18 @@ declare global { interface Window { Telegram: any; } }
       </div>
 
       <!-- Loading State -->
-      <div *ngIf="loading && accounts.length === 0" class="flex justify-center mt-10">
+      <div *ngIf="loading && accounts.length === 0" class="flex justify-center mt-10 shrink-0">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--tg-theme-button-color,#3b82f6)]"></div>
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="!loading && accounts.length === 0" class="text-center mt-10 p-6 bg-[var(--tg-theme-bg-color,#ffffff)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm">
+      <div *ngIf="!loading && accounts.length === 0" class="text-center mt-10 p-6 bg-[var(--tg-theme-bg-color,#ffffff)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm shrink-0">
         <p class="text-[var(--tg-theme-hint-color,#6b7280)] font-medium">You aren't tracking any IDs.</p>
         <p class="text-sm mt-2 text-[var(--tg-theme-hint-color,#6b7280)] opacity-80">Tap the + button below to get started.</p>
       </div>
 
       <!-- Meter List -->
-      <div *ngIf="accounts.length > 0" class="space-y-4">
+      <div *ngIf="accounts.length > 0" class="space-y-4 shrink-0">
         <div *ngFor="let acc of accounts"
              (click)="selectMeter(acc)"
              class="rounded-2xl p-5 shadow-sm bg-[var(--tg-theme-bg-color,#ffffff)] border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] cursor-pointer hover:shadow-md active:scale-[0.98] transition-all">
@@ -75,6 +75,13 @@ declare global { interface Window { Telegram: any; } }
             </p>
           </div>
         </div>
+      </div>
+
+      <!-- Footer -->
+      <div *ngIf="accounts.length > 0 || !loading" class="mt-auto pt-10 pb-4 text-center shrink-0">
+        <p class="text-[11px] font-bold tracking-widest text-[var(--tg-theme-hint-color,#6b7280)] opacity-40 uppercase">
+          Developed with ❤️ by Nomaan
+        </p>
       </div>
 
       <!-- Floating Action Button (FAB) -->
