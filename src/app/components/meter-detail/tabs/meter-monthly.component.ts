@@ -44,7 +44,7 @@ import Chart from 'chart.js/auto';
           </div>
           <div>
             <h3 class="font-bold text-[var(--tg-theme-text-color,#111827)] text-base">6-Month Trend</h3>
-            <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5">Tap to view cost analysis chart</p>
+            <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5">Tap to view cost & usage analysis</p>
           </div>
         </div>
         <div class="text-[var(--tg-theme-button-color,#3b82f6)] bg-[var(--tg-theme-button-color,#3b82f6)]/10 p-2 rounded-full">
@@ -92,11 +92,11 @@ import Chart from 'chart.js/auto';
           </div>
 
           <div class="p-5 bg-[var(--tg-theme-bg-color,#ffffff)]">
-            <div class="mb-4">
-              <p class="text-sm font-bold text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider">Total Deduction (Last 6 Months)</p>
+            <div class="mb-2">
+              <p class="text-sm font-bold text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider">Cost vs Usage (Last 6 Months)</p>
             </div>
 
-            <div class="relative h-64 w-full">
+            <div class="relative h-72 w-full mt-2">
               <canvas #trendChart></canvas>
             </div>
           </div>
@@ -130,12 +130,12 @@ import Chart from 'chart.js/auto';
           <div class="p-6 overflow-y-auto custom-scrollbar">
 
             <!-- Summary Metric -->
-            <div class="flex justify-between items-center mb-6 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-900/30">
+            <div class="flex justify-between items-center mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
               <div>
                 <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase font-bold tracking-wider mb-0.5">Electricity Used</p>
-                <p class="text-xl font-black text-[var(--tg-theme-button-color,#3b82f6)]">{{ selectedMonth.usedElectricityKwh }} kWh</p>
+                <p class="text-xl font-black text-emerald-600 dark:text-emerald-500">{{ selectedMonth.usedElectricityKwh }} kWh</p>
               </div>
-              <div class="h-10 w-10 bg-blue-100 dark:bg-blue-800/30 rounded-full flex items-center justify-center text-[var(--tg-theme-button-color,#3b82f6)]">
+              <div class="h-10 w-10 bg-emerald-100 dark:bg-emerald-800/30 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -245,7 +245,8 @@ export class MeterMonthlyComponent {
 
     return data.map(d => ({
       label: d.month.substring(0, 3), // e.g., 'Jan', 'Feb'
-      value: this.parseAmount(d.totalUsageOrDeduction),
+      cost: this.parseAmount(d.totalUsageOrDeduction),
+      kwh: this.parseAmount(d.usedElectricityKwh)
     }));
   }
 
@@ -278,51 +279,101 @@ export class MeterMonthlyComponent {
     const dataPoints = this.monthlyChartData;
 
     this.chartInstance = new Chart(ctx, {
-      type: 'bar',
       data: {
         labels: dataPoints.map(d => d.label),
-        datasets: [{
-          label: 'Total Cost (৳)',
-          data: dataPoints.map(d => d.value),
-          backgroundColor: '#3b82f6', // Telegram Theme Blue fallback
-          borderRadius: 6,
-          barPercentage: 0.6
-        }]
+        datasets: [
+          {
+            type: 'line',
+            label: 'Usage (kWh)',
+            data: dataPoints.map(d => d.kwh),
+            borderColor: '#10b981', // Emerald Green
+            backgroundColor: '#10b981',
+            borderWidth: 2,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#10b981',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            tension: 0.3, // Smooth curve
+            yAxisID: 'y1' // Right axis
+          },
+          {
+            type: 'bar',
+            label: 'Cost (৳)',
+            data: dataPoints.map(d => d.cost),
+            backgroundColor: '#3b82f6', // Telegram Theme Blue fallback
+            borderRadius: 6,
+            barPercentage: 0.6,
+            yAxisID: 'y' // Left axis
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
         plugins: {
-          legend: { display: false },
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              boxWidth: 8,
+              font: { family: 'sans-serif', size: 12 }
+            }
+          },
           tooltip: {
             backgroundColor: 'rgba(17, 24, 39, 0.9)',
             titleFont: { size: 13, family: 'sans-serif' },
             bodyFont: { size: 14, weight: 'bold', family: 'sans-serif' },
             padding: 12,
             cornerRadius: 8,
-            displayColors: false,
             callbacks: {
-              label: (context) => `৳ ${context.parsed.y?.toLocaleString()}`
+              label: (context) => {
+                if (context.datasetIndex === 0) {
+                  return ` Cost: ৳ ${context.parsed.y?.toLocaleString()}`;
+                } else {
+                  return ` Usage: ${context.parsed.y?.toLocaleString()} kWh`;
+                }
+              }
             }
           }
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: { display: false },
-            border: { display: false },
-            ticks: {
-              font: { family: 'sans-serif', size: 11 },
-              color: '#6b7280',
-              callback: (value) => '৳' + value
-            }
-          },
           x: {
             grid: { display: false },
             border: { display: false },
             ticks: {
               font: { family: 'sans-serif', size: 12, weight: 'bold' },
               color: '#9ca3af'
+            }
+          },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            beginAtZero: true,
+            grid: { display: true, color: 'rgba(156, 163, 175, 0.1)' },
+            border: { display: false },
+            ticks: {
+              font: { family: 'sans-serif', size: 10 },
+              color: '#6b7280',
+              callback: (value) => '৳' + value
+            }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            beginAtZero: true,
+            grid: { drawOnChartArea: false }, // Prevent overlapping grid lines
+            border: { display: false },
+            ticks: {
+              font: { family: 'sans-serif', size: 10 },
+              color: '#10b981', // Match line color
+              callback: (value) => value + ' kWh'
             }
           }
         }
