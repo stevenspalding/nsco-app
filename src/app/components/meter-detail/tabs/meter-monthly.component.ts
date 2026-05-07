@@ -1,15 +1,19 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-meter-monthly',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="space-y-3 pb-20">
+    <div class="space-y-4 pb-20">
 
       <!-- Loading Skeletons -->
       <ng-container *ngIf="isLoading && monthlyUsage.length === 0">
+        <!-- Button Skeleton -->
+        <div class="bg-[var(--tg-theme-bg-color,#ffffff)] h-20 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm animate-pulse mb-4"></div>
+        <!-- List Skeletons -->
         <div *ngFor="let i of [1, 2, 3, 4]" class="bg-[var(--tg-theme-bg-color,#ffffff)] p-4 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm animate-pulse flex justify-between items-center">
           <div class="space-y-2 w-1/2">
             <div class="h-5 w-3/4 bg-black/10 dark:bg-white/10 rounded-md"></div>
@@ -28,19 +32,41 @@ import { CommonModule } from '@angular/common';
         <p class="text-sm mt-2 text-[var(--tg-theme-hint-color,#6b7280)] opacity-80">Check back later after the billing cycle completes.</p>
       </div>
 
+      <!-- Open Chart Modal Button -->
+      <div *ngIf="monthlyUsage.length > 0"
+           (click)="openChartModal()"
+           class="bg-[var(--tg-theme-button-color,#3b82f6)]/10 p-4 rounded-2xl border border-[var(--tg-theme-button-color,#3b82f6)]/20 shadow-sm flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform animate-fade-in">
+        <div class="flex items-center space-x-3">
+          <div class="p-2.5 bg-[var(--tg-theme-button-color,#3b82f6)] text-white rounded-xl shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-[var(--tg-theme-text-color,#111827)] text-base">6-Month Trend</h3>
+            <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5">Tap to view cost analysis chart</p>
+          </div>
+        </div>
+        <div class="text-[var(--tg-theme-button-color,#3b82f6)] bg-[var(--tg-theme-button-color,#3b82f6)]/10 p-2 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+
       <!-- Monthly List -->
       <div *ngIf="monthlyUsage.length > 0" class="space-y-3">
         <div *ngFor="let month of monthlyUsage"
              (click)="openModal(month)"
-             class="bg-[var(--tg-theme-bg-color,#ffffff)] p-4 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm cursor-pointer hover:shadow-md active:scale-[0.98] transition-all flex justify-between items-center relative overflow-hidden">
+             class="bg-[var(--tg-theme-bg-color,#ffffff)] p-4 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm cursor-pointer hover:shadow-md active:scale-[0.98] transition-all flex justify-between items-center relative overflow-hidden animate-fade-in">
 
           <div class="relative z-10">
             <p class="font-bold text-lg text-[var(--tg-theme-text-color,#111827)]">{{ month.month }}, {{ month.year }}</p>
-            <p class="text-sm text-[var(--tg-theme-hint-color,#6b7280)] flex items-center mt-0.5">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <p class="text-sm text-[var(--tg-theme-hint-color,#6b7280)] flex items-center mt-0.5 font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[var(--tg-theme-button-color,#3b82f6)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              {{ month.usedElectricityKwh }} kWh
+              {{ month.usedElectricityKwh }} kWh Used
             </p>
           </div>
 
@@ -48,6 +74,37 @@ import { CommonModule } from '@angular/common';
             <p class="font-black text-red-500 text-lg">-৳{{ month.totalUsageOrDeduction }}</p>
             <p *ngIf="month.totalRecharge > 0" class="text-xs font-bold text-green-500 mt-0.5">Recharge: +৳{{ month.totalRecharge }}</p>
             <p *ngIf="!month.totalRecharge || month.totalRecharge == 0" class="text-xs font-medium text-[var(--tg-theme-hint-color,#6b7280)] mt-0.5">No Recharge</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Detail Modal -->
+      <div *ngIf="showChartModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-3xl w-full max-w-md shadow-2xl animate-fade-in overflow-hidden flex flex-col border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
+
+          <div class="px-5 py-4 border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)]/50 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-[var(--tg-theme-text-color,#111827)]">Trend Analysis</h3>
+            <button (click)="closeChartModal()" class="p-1.5 bg-[var(--tg-theme-secondary-bg-color,#e5e7eb)] text-[var(--tg-theme-hint-color,#6b7280)] rounded-full hover:text-red-500 active:scale-95 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-5 bg-[var(--tg-theme-bg-color,#ffffff)]">
+            <div class="mb-4">
+              <p class="text-sm font-bold text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider">Total Deduction (Last 6 Months)</p>
+            </div>
+
+            <div class="relative h-64 w-full">
+              <canvas #trendChart></canvas>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
+            <button (click)="closeChartModal()" class="w-full py-3 rounded-xl font-bold bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] hover:opacity-80 active:scale-[0.98] transition-all">
+              Close Chart
+            </button>
           </div>
         </div>
       </div>
@@ -159,8 +216,6 @@ import { CommonModule } from '@angular/common';
     .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     .animate-fade-in { animation: fadeIn 0.2s ease-out; }
     .pb-safe { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
-
-    /* Hide scrollbar for clean look */
     .custom-scrollbar::-webkit-scrollbar { width: 0px; }
     .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   `]
@@ -169,8 +224,111 @@ export class MeterMonthlyComponent {
   @Input() monthlyUsage: any[] = [];
   @Input() isLoading: boolean = false;
 
+  @ViewChild('trendChart') chartCanvas!: ElementRef;
+  chartInstance: any;
+
   selectedMonth: any = null;
+  showChartModal: boolean = false;
+
   private tg = (window as any).Telegram?.WebApp;
+
+  // Safely parse numbers from strings that might contain commas
+  private parseAmount(val: any): number {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    return parseFloat(val.toString().replace(/,/g, '')) || 0;
+  }
+
+  get monthlyChartData() {
+    if (!this.monthlyUsage || this.monthlyUsage.length === 0) return [];
+    const data = this.monthlyUsage.slice(0, 6).reverse();
+
+    return data.map(d => ({
+      label: d.month.substring(0, 3), // e.g., 'Jan', 'Feb'
+      value: this.parseAmount(d.totalUsageOrDeduction),
+    }));
+  }
+
+  openChartModal() {
+    if (this.tg?.HapticFeedback) {
+      this.tg.HapticFeedback.selectionChanged();
+    }
+    this.showChartModal = true;
+
+    // Allow Angular to render the canvas element before initializing Chart.js
+    setTimeout(() => {
+      this.renderChart();
+    }, 50);
+  }
+
+  closeChartModal() {
+    this.showChartModal = false;
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
+  }
+
+  renderChart() {
+    if (!this.chartCanvas) return;
+
+    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+    if (this.chartInstance) this.chartInstance.destroy();
+
+    const dataPoints = this.monthlyChartData;
+
+    this.chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: dataPoints.map(d => d.label),
+        datasets: [{
+          label: 'Total Cost (৳)',
+          data: dataPoints.map(d => d.value),
+          backgroundColor: '#3b82f6', // Telegram Theme Blue fallback
+          borderRadius: 6,
+          barPercentage: 0.6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(17, 24, 39, 0.9)',
+            titleFont: { size: 13, family: 'sans-serif' },
+            bodyFont: { size: 14, weight: 'bold', family: 'sans-serif' },
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: false,
+            callbacks: {
+              label: (context) => `৳ ${context.parsed.y?.toLocaleString()}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { display: false },
+            border: { display: false },
+            ticks: {
+              font: { family: 'sans-serif', size: 11 },
+              color: '#6b7280',
+              callback: (value) => '৳' + value
+            }
+          },
+          x: {
+            grid: { display: false },
+            border: { display: false },
+            ticks: {
+              font: { family: 'sans-serif', size: 12, weight: 'bold' },
+              color: '#9ca3af'
+            }
+          }
+        }
+      }
+    });
+  }
 
   openModal(month: any) {
     if (this.tg?.HapticFeedback) {
