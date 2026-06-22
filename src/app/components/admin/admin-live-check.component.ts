@@ -152,9 +152,54 @@ import { AdminService } from '../../services/admin.service';
             </div>
 
           </div>
-        </div>
 
+          <!-- Firebase Daily Usage History -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[600px] mt-6">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 flex justify-between items-center">
+              <h3 class="font-bold text-lg text-gray-900">Recorded Daily Usage (Firebase)</h3>
+              <span class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg">{{ liveResult.firebaseHistory?.length || 0 }} Records</span>
+            </div>
+            <div class="overflow-y-auto p-0">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50 sticky top-0">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage Deduction</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recharge Added</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Notified</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                  <tr *ngFor="let row of liveResult.firebaseHistory" class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ row.date }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap font-bold" [ngClass]="row.usage > 0 ? 'text-red-500' : 'text-gray-400'">
+                      {{ row.usage > 0 ? '-৳' + row.usage : 'No Change' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap font-bold" [ngClass]="row.rechargeAdded > 0 ? 'text-green-600' : 'text-gray-400'">
+                      {{ row.rechargeAdded > 0 ? '+৳' + row.rechargeAdded : '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap font-black text-gray-900">৳{{ row.balance }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                      <span *ngIf="row.notified" class="inline-flex items-center justify-center bg-green-100 text-green-600 rounded-full h-6 w-6" title="User Notified">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                      </span>
+                      <span *ngIf="!row.notified" class="inline-flex items-center justify-center bg-gray-100 text-gray-400 rounded-full h-6 w-6" title="Silent Sync (Not Notified)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!liveResult.firebaseHistory || liveResult.firebaseHistory.length === 0">
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">No daily history recorded in Firebase.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
       </div>
+
     </div>
   `,
   styles: [`
