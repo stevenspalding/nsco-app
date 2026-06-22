@@ -9,13 +9,13 @@ import { AdminService } from '../../services/admin.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gray-100 text-gray-900 font-sans pb-10">
+    <div class="min-h-screen bg-gray-900 text-gray-100 font-sans pb-10">
 
       <!-- Top Navigation -->
-      <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <nav class="bg-gray-800 shadow-sm border-b border-gray-700 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center h-16">
-            <button (click)="goBack()" class="mr-4 p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors">
+            <button (click)="goBack()" class="mr-4 p-2 rounded-full hover:bg-gray-700 text-gray-400 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
@@ -25,7 +25,7 @@ import { AdminService } from '../../services/admin.service';
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <span class="text-xl font-black tracking-tight">Full Diagnostic Check</span>
+            <span class="text-xl font-black tracking-tight text-white">Full Diagnostic Check</span>
           </div>
         </div>
       </nav>
@@ -33,17 +33,17 @@ import { AdminService } from '../../services/admin.service';
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         <!-- Search Box -->
-        <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 items-center">
+        <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-sm flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 items-center">
           <input type="number" [(ngModel)]="liveCheckId" placeholder="Enter Consumer ID (e.g., 11223344)" (keyup.enter)="runLiveCheck()"
-                 class="flex-1 w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 transition-colors font-mono font-bold text-lg">
+                 class="flex-1 w-full bg-gray-900 border-2 border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 transition-colors font-mono font-bold text-lg">
           <button (click)="runLiveCheck()" [disabled]="isChecking || !liveCheckId"
-                  class="w-full sm:w-auto bg-gray-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold transition-all disabled:opacity-50 flex items-center justify-center min-w-[140px]">
+                  class="w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-xl font-bold transition-all disabled:opacity-50 flex items-center justify-center min-w-[140px]">
             <span *ngIf="!isChecking">Run Check</span>
             <svg *ngIf="isChecking" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
           </button>
         </div>
 
-        <div *ngIf="liveCheckError" class="text-sm font-bold text-red-500 bg-red-50 py-3 px-4 rounded-xl border border-red-100">
+        <div *ngIf="liveCheckError" class="text-sm font-bold text-red-400 bg-red-900/20 py-3 px-4 rounded-xl border border-red-500/30">
           {{ liveCheckError }}
         </div>
 
@@ -51,39 +51,39 @@ import { AdminService } from '../../services/admin.service';
         <div *ngIf="liveResult" class="space-y-6 animate-fade-in">
 
           <!-- Customer Info -->
-          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-              <h3 class="font-bold text-lg text-gray-900">Customer & Meter Info</h3>
-              <span class="text-xs font-bold text-gray-500 bg-gray-200 px-2 py-1 rounded-md">Updated: {{ liveResult.customerInfo?.balanceUpdateTime || 'N/A' }}</span>
+          <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
+              <h3 class="font-bold text-lg text-white">Customer & Meter Info</h3>
+              <span class="text-xs font-bold text-gray-400 bg-gray-900 px-2 py-1 rounded-md">Updated: {{ liveResult.customerInfo?.balanceUpdateTime || 'N/A' }}</span>
             </div>
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Customer Name</p>
-                <p class="font-bold text-gray-900 text-lg">{{ liveResult.customerInfo?.customerName || 'N/A' }}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Customer Name</p>
+                <p class="font-bold text-white text-lg">{{ liveResult.customerInfo?.customerName || 'N/A' }}</p>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Current Balance</p>
-                <p class="font-black text-blue-600 text-2xl">৳{{ liveResult.customerInfo?.remainingBalance || '0.00' }}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Current Balance</p>
+                <p class="font-black text-blue-500 text-2xl">৳{{ liveResult.customerInfo?.remainingBalance || '0.00' }}</p>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Meter Number</p>
-                <p class="font-mono font-bold text-gray-900">{{ liveResult.customerInfo?.meterNo || 'N/A' }}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Meter Number</p>
+                <p class="font-mono font-bold text-white">{{ liveResult.customerInfo?.meterNo || 'N/A' }}</p>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Status</p>
-                <p class="font-bold" [ngClass]="liveResult.customerInfo?.meterStatus === 'Active' ? 'text-green-600' : 'text-red-500'">{{ liveResult.customerInfo?.meterStatus || 'N/A' }}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Status</p>
+                <p class="font-bold" [ngClass]="liveResult.customerInfo?.meterStatus === 'Active' ? 'text-green-400' : 'text-red-500'">{{ liveResult.customerInfo?.meterStatus || 'N/A' }}</p>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Mobile</p>
-                <p class="font-bold text-gray-900">{{ liveResult.customerInfo?.mobile || 'N/A' }}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Mobile</p>
+                <p class="font-bold text-white">{{ liveResult.customerInfo?.mobile || 'N/A' }}</p>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">SND Office</p>
-                <p class="font-bold text-gray-900">{{ liveResult.customerInfo?.sndOffice || 'N/A' }}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">SND Office</p>
+                <p class="font-bold text-white">{{ liveResult.customerInfo?.sndOffice || 'N/A' }}</p>
               </div>
               <div class="col-span-1 md:col-span-2 lg:col-span-3">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Address</p>
-                <p class="font-medium text-gray-900">{{ liveResult.customerInfo?.address || 'N/A' }}</p>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Address</p>
+                <p class="font-medium text-white">{{ liveResult.customerInfo?.address || 'N/A' }}</p>
               </div>
             </div>
           </div>
@@ -92,29 +92,29 @@ import { AdminService } from '../../services/admin.service';
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- Recharge History -->
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
-              <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 sticky top-0">
-                <h3 class="font-bold text-lg text-gray-900">Recharge History</h3>
+            <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
+              <div class="px-6 py-4 border-b border-gray-700 bg-gray-800/50 sticky top-0">
+                <h3 class="font-bold text-lg text-white">Recharge History</h3>
               </div>
               <div class="overflow-y-auto p-0">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50 sticky top-0">
+                <table class="min-w-full divide-y divide-gray-700">
+                  <thead class="bg-gray-900 sticky top-0">
                     <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Amount</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Added</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Token</th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                    <tr *ngFor="let row of liveResult.rechargeHistory" class="hover:bg-gray-50">
-                      <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ row.rechargeDate }}</td>
-                      <td class="px-6 py-4 whitespace-nowrap font-black text-green-600">৳{{ row.rechargeAmount }}</td>
-                      <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">৳{{ row.electricityCharge }}</td>
-                      <td class="px-6 py-4 whitespace-nowrap font-mono text-gray-500 text-xs">{{ row.tokenNo || 'N/A' }}</td>
+                  <tbody class="bg-gray-800 divide-y divide-gray-700 text-sm">
+                    <tr *ngFor="let row of liveResult.rechargeHistory" class="hover:bg-gray-700/50 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap font-medium text-white">{{ row.rechargeDate }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap font-black text-green-400">৳{{ row.rechargeAmount }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap font-bold text-white">৳{{ row.electricityCharge }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap font-mono text-gray-400 text-xs">{{ row.tokenNo || 'N/A' }}</td>
                     </tr>
                     <tr *ngIf="!liveResult.rechargeHistory || liveResult.rechargeHistory.length === 0">
-                      <td colspan="4" class="px-6 py-8 text-center text-gray-500">No recharge data available.</td>
+                      <td colspan="4" class="px-6 py-8 text-center text-gray-400">No recharge data available.</td>
                     </tr>
                   </tbody>
                 </table>
@@ -122,29 +122,29 @@ import { AdminService } from '../../services/admin.service';
             </div>
 
             <!-- Monthly Usage -->
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
-              <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 sticky top-0">
-                <h3 class="font-bold text-lg text-gray-900">Monthly Usage</h3>
+            <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
+              <div class="px-6 py-4 border-b border-gray-700 bg-gray-800/50 sticky top-0">
+                <h3 class="font-bold text-lg text-white">Monthly Usage</h3>
               </div>
               <div class="overflow-y-auto p-0">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50 sticky top-0">
+                <table class="min-w-full divide-y divide-gray-700">
+                  <thead class="bg-gray-900 sticky top-0">
                     <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage (KWh)</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deduction</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Month</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Usage (KWh)</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Deduction</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">End Balance</th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                    <tr *ngFor="let row of liveResult.monthlyUsage" class="hover:bg-gray-50">
-                      <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-900">{{ row.month }}, {{ row.year }}</td>
-                      <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ row.usedElectricityKwh }}</td>
+                  <tbody class="bg-gray-800 divide-y divide-gray-700 text-sm">
+                    <tr *ngFor="let row of liveResult.monthlyUsage" class="hover:bg-gray-700/50 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap font-bold text-white">{{ row.month }}, {{ row.year }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-white">{{ row.usedElectricityKwh }}</td>
                       <td class="px-6 py-4 whitespace-nowrap font-bold text-red-500">-৳{{ row.totalUsageOrDeduction }}</td>
-                      <td class="px-6 py-4 whitespace-nowrap font-black" [ngClass]="getParseAmount(row.monthEndBalance) < 0 ? 'text-red-500' : 'text-gray-900'">৳{{ row.monthEndBalance }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap font-black" [ngClass]="getParseAmount(row.monthEndBalance) < 0 ? 'text-red-500' : 'text-white'">৳{{ row.monthEndBalance }}</td>
                     </tr>
                     <tr *ngIf="!liveResult.monthlyUsage || liveResult.monthlyUsage.length === 0">
-                      <td colspan="4" class="px-6 py-8 text-center text-gray-500">No monthly data available.</td>
+                      <td colspan="4" class="px-6 py-8 text-center text-gray-400">No monthly data available.</td>
                     </tr>
                   </tbody>
                 </table>
@@ -154,43 +154,43 @@ import { AdminService } from '../../services/admin.service';
           </div>
 
           <!-- Firebase Daily Usage History -->
-          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col max-h-[600px] mt-6">
-            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 flex justify-between items-center">
-              <h3 class="font-bold text-lg text-gray-900">Recorded Daily Usage (Firebase)</h3>
-              <span class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg">{{ liveResult.firebaseHistory?.length || 0 }} Records</span>
+          <div class="bg-gray-800 rounded-2xl border border-gray-700 shadow-sm overflow-hidden flex flex-col max-h-[600px] mt-6">
+            <div class="px-6 py-4 border-b border-gray-700 bg-gray-800/50 sticky top-0 flex justify-between items-center">
+              <h3 class="font-bold text-lg text-white">Recorded Daily Usage (Firebase)</h3>
+              <span class="text-xs font-bold text-blue-400 bg-blue-900/30 border border-blue-500/30 px-3 py-1 rounded-lg">{{ liveResult.firebaseHistory?.length || 0 }} Records</span>
             </div>
             <div class="overflow-y-auto p-0">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50 sticky top-0">
+              <table class="min-w-full divide-y divide-gray-700">
+                <thead class="bg-gray-900 sticky top-0">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage Deduction</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recharge Added</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Balance</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Notified</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date & Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Usage Deduction</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Recharge Added</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">End Balance</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Notified</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                  <tr *ngFor="let row of liveResult.firebaseHistory" class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ row.date }}</td>
+                <tbody class="bg-gray-800 divide-y divide-gray-700 text-sm">
+                  <tr *ngFor="let row of liveResult.firebaseHistory" class="hover:bg-gray-700/50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-white">{{ row.date }}</td>
                     <td class="px-6 py-4 whitespace-nowrap font-bold" [ngClass]="row.usage > 0 ? 'text-red-500' : 'text-gray-400'">
                       {{ row.usage > 0 ? '-৳' + row.usage : 'No Change' }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap font-bold" [ngClass]="row.rechargeAdded > 0 ? 'text-green-600' : 'text-gray-400'">
+                    <td class="px-6 py-4 whitespace-nowrap font-bold" [ngClass]="row.rechargeAdded > 0 ? 'text-green-400' : 'text-gray-400'">
                       {{ row.rechargeAdded > 0 ? '+৳' + row.rechargeAdded : '-' }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap font-black text-gray-900">৳{{ row.balance }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap font-black text-white">৳{{ row.balance }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-center">
-                      <span *ngIf="row.notified" class="inline-flex items-center justify-center bg-green-100 text-green-600 rounded-full h-6 w-6" title="User Notified">
+                      <span *ngIf="row.notified" class="inline-flex items-center justify-center bg-green-900/30 text-green-400 rounded-full h-6 w-6" title="User Notified">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                       </span>
-                      <span *ngIf="!row.notified" class="inline-flex items-center justify-center bg-gray-100 text-gray-400 rounded-full h-6 w-6" title="Silent Sync (Not Notified)">
+                      <span *ngIf="!row.notified" class="inline-flex items-center justify-center bg-gray-900 text-gray-500 rounded-full h-6 w-6" title="Silent Sync (Not Notified)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                       </span>
                     </td>
                   </tr>
                   <tr *ngIf="!liveResult.firebaseHistory || liveResult.firebaseHistory.length === 0">
-                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">No daily history recorded in Firebase.</td>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-400">No daily history recorded in Firebase.</td>
                   </tr>
                 </tbody>
               </table>
