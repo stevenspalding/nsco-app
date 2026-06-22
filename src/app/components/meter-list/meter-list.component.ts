@@ -12,19 +12,19 @@ declare global { interface Window { Telegram: any; } }
   imports: [CommonModule, FormsModule],
   template: `
     <div class="fixed inset-0 overflow-y-auto p-4 pb-20 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] font-sans flex flex-col">
-
+      
       <!-- Header -->
       <div class="flex justify-between items-center mb-6 mt-2 shrink-0">
         <h1 class="text-3xl font-bold">My Meters</h1>
         <div class="flex items-center space-x-3">
-
+          
           <!-- Refresh Button -->
           <button (click)="fetchList(true)" [disabled]="loading" class="p-2 text-[var(--tg-theme-button-color,#3b82f6)] hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-colors active:scale-95 disabled:opacity-50">
             <svg [class.animate-spin]="loading" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
-
+          
           <!-- Profile Button (Dynamic Avatar) -->
           <button (click)="openProfile()" class="h-10 w-10 rounded-full bg-gradient-to-tr from-[var(--tg-theme-button-color,#3b82f6)] to-blue-400 p-[2px] transition-transform active:scale-95 shadow-sm">
             <div class="w-full h-full rounded-full border-2 border-[var(--tg-theme-bg-color,#ffffff)] bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] flex items-center justify-center text-[var(--tg-theme-button-color,#3b82f6)] text-sm font-bold overflow-hidden">
@@ -49,20 +49,20 @@ declare global { interface Window { Telegram: any; } }
 
       <!-- Meter List -->
       <div *ngIf="accounts.length > 0" class="space-y-4 shrink-0">
-        <div *ngFor="let acc of accounts"
-             (click)="selectMeter(acc)"
+        <div *ngFor="let acc of accounts" 
+             (click)="selectMeter(acc)" 
              class="rounded-2xl p-5 shadow-sm bg-[var(--tg-theme-bg-color,#ffffff)] border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] cursor-pointer hover:shadow-md active:scale-[0.98] transition-all">
           <div class="flex justify-between items-center mb-1">
             <p class="text-xl font-bold font-mono tracking-tight text-[var(--tg-theme-text-color,#111827)]">
               {{ acc.id }}
             </p>
             <div class="text-right whitespace-nowrap">
-              <p class="text-2xl font-black" [ngClass]="acc.lastBalance < 100 ? 'text-red-500' : 'text-green-500'">
-                ৳{{ acc.lastBalance | number:'1.2-2' }}
+              <p class="text-2xl font-black" [ngClass]="acc.lastBalance === 'Offline' ? 'text-[var(--tg-theme-hint-color,#6b7280)]' : (acc.lastBalance < 100 ? 'text-red-500' : 'text-green-500')">
+                {{ acc.lastBalance === 'Offline' ? 'Offline' : '৳' + (acc.lastBalance | number:'1.2-2') }}
               </p>
             </div>
           </div>
-
+          
           <div class="flex justify-between items-center text-sm">
             <p class="text-[var(--tg-theme-hint-color,#6b7280)] font-medium truncate pr-4">
               {{ acc.displayName ? acc.displayName : (acc.customerName && acc.customerName !== 'N/A' ? acc.customerName : 'Unnamed Meter') }}
@@ -71,7 +71,7 @@ declare global { interface Window { Telegram: any; } }
                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                </svg>
-               {{ acc.lastUpdateMs ? (acc.lastUpdateMs | date:'dd MMM yyyy') : (acc.lastUpdateTime?.split(' ')[0] || 'Unknown') }}
+               {{ acc.lastUpdateTime === 'Unknown' ? 'Unknown' : (acc.lastUpdateMs ? (acc.lastUpdateMs | date:'dd MMM yyyy') : (acc.lastUpdateTime?.split(' ')[0] || 'Unknown')) }}
             </p>
           </div>
         </div>
@@ -85,7 +85,7 @@ declare global { interface Window { Telegram: any; } }
       </div>
 
       <!-- Floating Action Button (FAB) -->
-      <button (click)="openAddModal()"
+      <button (click)="openAddModal()" 
               class="fixed bottom-6 right-6 w-14 h-14 bg-[var(--tg-theme-button-color,#3b82f6)] text-[var(--tg-theme-button-text-color,#ffffff)] rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center hover:opacity-90 active:scale-90 transition-all z-40">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
@@ -97,14 +97,14 @@ declare global { interface Window { Telegram: any; } }
         <div class="bg-[var(--tg-theme-bg-color,#ffffff)] rounded-t-3xl sm:rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-slide-up sm:animate-fade-in pb-safe">
           <h3 class="text-2xl font-bold text-[var(--tg-theme-text-color,#111827)] mb-2">Add Meter</h3>
           <p class="text-sm text-[var(--tg-theme-hint-color,#6b7280)] mb-5">Enter your NESCO Consumer ID to start tracking.</p>
-
+          
           <div *ngIf="addError" class="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
             {{ addError }}
           </div>
 
           <div class="mb-6">
-            <input #meterInput
-                   type="number"
+            <input #meterInput 
+                   type="number" 
                    inputmode="numeric"
                    placeholder="e.g. 11223344"
                    [value]="newMeterId"
@@ -113,7 +113,7 @@ declare global { interface Window { Telegram: any; } }
                    [disabled]="isAdding"
                    class="w-full bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--tg-theme-button-color,#3b82f6)] transition-shadow">
           </div>
-
+          
           <div class="flex space-x-3">
             <button (click)="closeAddModal()" [disabled]="isAdding" class="flex-1 py-3 rounded-xl font-bold bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] hover:opacity-80 active:scale-95 transition-all">
               Cancel

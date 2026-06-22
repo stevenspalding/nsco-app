@@ -7,14 +7,14 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="space-y-3">
-
+      
       <!-- Controls Header -->
       <div *ngIf="dailyHistory.length > 0" class="flex justify-between items-center bg-[var(--tg-theme-bg-color,#ffffff)] p-2.5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm">
 
         <!-- Month Selector -->
         <div class="flex-1 mr-2 relative">
-          <select
-            [value]="selectedMonth"
+          <select 
+            [value]="selectedMonth" 
             (change)="onMonthChange($event)"
             class="w-full appearance-none bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-text-color,#111827)] text-sm font-bold py-2.5 pl-4 pr-10 rounded-xl outline-none focus:ring-2 focus:ring-[var(--tg-theme-button-color,#3b82f6)]/50 cursor-pointer">
             <option *ngFor="let month of availableMonths" [value]="month.value">{{ month.label }}</option>
@@ -27,16 +27,12 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <!-- Sort Toggle Button -->
-        <button
-          (click)="toggleSort()"
+        <button 
+          (click)="toggleSort()" 
           class="shrink-0 bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] hover:bg-gray-200 dark:hover:bg-gray-700 text-[var(--tg-theme-text-color,#111827)] py-2.5 px-4 rounded-xl flex items-center justify-center font-bold text-sm transition-colors active:scale-95">
           <span class="mr-1.5">{{ sortOrder === 'desc' ? 'Newest' : 'Oldest' }}</span>
-          <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-          </svg>
-          <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-          </svg>
+          <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
+          <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
         </button>
       </div>
 
@@ -57,9 +53,7 @@ import { CommonModule } from '@angular/common';
 
             <!-- Date with Icon -->
             <div class="flex items-center text-[var(--tg-theme-text-color,#111827)]">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-[var(--tg-theme-button-color,#3b82f6)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-[var(--tg-theme-button-color,#3b82f6)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
               <span class="font-bold text-[15px] tracking-wide">{{ getUsageDate(row.date) | date:'dd MMM yyyy' }}</span>
             </div>
 
@@ -67,22 +61,16 @@ import { CommonModule } from '@angular/common';
             <div class="flex items-center flex-wrap gap-2">
 
               <!-- Usage Pill -->
-              <span *ngIf="row.usage > 0" class="inline-flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-red-500 text-white shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <span *ngIf="row.usage === 'Offline'" class="inline-flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-hint-color,#6b7280)] shadow-sm">Offline</span>
+              <span *ngIf="row.usage > 0 && row.usage !== 'Offline'" class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-md bg-red-500 text-white shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 -৳{{ row.usage }}
               </span>
-
-              <!-- <span *ngIf="row.usage === 0" class="inline-flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-hint-color,#6b7280)] border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm">
-                No Change
-              </span> -->
+              <span *ngIf="row.usage === 0" class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-md bg-[var(--tg-theme-secondary-bg-color,#f3f4f6)] text-[var(--tg-theme-hint-color,#6b7280)] border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm">No Change</span>
 
               <!-- Recharge Pill (High Contrast Solid Color) -->
               <span *ngIf="row.rechargeAdded > 0" class="inline-flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-green-500 text-white shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 +৳{{ row.rechargeAdded }}
               </span>
             </div>
@@ -91,21 +79,20 @@ import { CommonModule } from '@angular/common';
           <!-- Right Side: HIGHLIGHTED BALANCE -->
           <div class="text-right z-10 pl-2">
             <p class="text-[var(--tg-theme-hint-color,#6b7280)] text-[10px] uppercase tracking-widest font-bold">Balance</p>
-            <div class="font-black text-2xl text-[var(--tg-theme-text-color,#111827)] tracking-tight">৳{{ row.balance }}</div>
+            <div class="font-black text-2xl text-[var(--tg-theme-text-color,#111827)] tracking-tight">
+               {{ row.balance === 'Offline' ? 'Offline' : '৳' + row.balance }}
+            </div>
           </div>
-
         </div>
       </div>
-
+      
       <!-- Empty States -->
       <div *ngIf="!isLoading && dailyHistory.length === 0" class="text-center p-6 bg-[var(--tg-theme-bg-color,#ffffff)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
         <p class="text-sm text-[var(--tg-theme-hint-color,#6b7280)] font-medium">No daily history recorded yet.</p>
       </div>
-
       <div *ngIf="!isLoading && dailyHistory.length > 0 && displayData.length === 0" class="text-center p-6 bg-[var(--tg-theme-bg-color,#ffffff)] rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)]">
         <p class="text-sm text-[var(--tg-theme-hint-color,#6b7280)] font-medium">No records found for {{ getSelectedMonthLabel() }}.</p>
       </div>
-
     </div>
   `
 })

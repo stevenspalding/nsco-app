@@ -7,23 +7,23 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="space-y-4">
-
+      
       <!-- Dynamic Current Balance Card -->
       <div [ngClass]="getCardClasses()" class="bg-gradient-to-br p-5 rounded-2xl shadow-md text-white transition-all duration-300 relative overflow-hidden">
-
+        
         <!-- Background loading pulse -->
         <div *ngIf="isLoading && info.remainingBalance == null" class="absolute inset-0 bg-white/10 animate-pulse"></div>
 
         <div class="flex justify-between items-start mb-1 relative z-10">
           <p class="text-white/90 text-sm font-semibold uppercase tracking-wider">Current Balance</p>
-
+          
           <span *ngIf="getBalanceState() === 'low'" class="bg-white/20 backdrop-blur-sm text-white px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider flex items-center shadow-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
             </svg>
             Low Balance
           </span>
-
+          
           <span *ngIf="getBalanceState() === 'negative'" class="bg-white/20 backdrop-blur-sm text-white px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider flex items-center shadow-sm animate-pulse">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -34,9 +34,10 @@ import { CommonModule } from '@angular/common';
 
         <p class="text-4xl font-black mb-2 tracking-tight relative z-10">
           <span *ngIf="isLoading && info.remainingBalance == null" class="inline-block w-32 h-10 bg-white/20 rounded-lg animate-pulse mt-1"></span>
-          <span *ngIf="info.remainingBalance != null">৳{{ info.remainingBalance }}</span>
+          <span *ngIf="info.remainingBalance != null && info.remainingBalance !== 'Offline'">৳{{ info.remainingBalance }}</span>
+          <span *ngIf="info.remainingBalance === 'Offline'" class="text-3xl text-white/80">Offline</span>
         </p>
-
+        
         <p class="text-xs text-white/80 flex items-center font-medium relative z-10">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -49,7 +50,7 @@ import { CommonModule } from '@angular/common';
       <!-- Customer Details (Itemized Skeletons) -->
       <div class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
         <h3 class="text-lg font-bold text-[var(--tg-theme-text-color,#111827)] border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] pb-2 mb-3">Customer Info</h3>
-
+        
         <div>
           <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Customer Name</p>
           <div *ngIf="isLoading && !info.customerName" class="h-6 w-3/4 bg-black/10 dark:bg-white/10 rounded-md animate-pulse"></div>
@@ -101,7 +102,7 @@ import { CommonModule } from '@angular/common';
       <!-- Meter Details Loaded Card -->
       <div *ngIf="!isLoading || info.consumerNo" class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
         <h3 class="text-lg font-bold text-[var(--tg-theme-text-color,#111827)] border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] pb-2 mb-3">Meter Info</h3>
-
+        
         <div class="flex justify-between">
           <div class="w-1/2">
             <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">Consumer No</p>
@@ -163,7 +164,7 @@ import { CommonModule } from '@angular/common';
       <!-- Office Details Loaded Card -->
       <div *ngIf="!isLoading || info.sndOffice" class="bg-[var(--tg-theme-bg-color,#ffffff)] p-5 rounded-2xl border border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] shadow-sm space-y-4">
         <h3 class="text-lg font-bold text-[var(--tg-theme-text-color,#111827)] border-b border-[var(--tg-theme-secondary-bg-color,#e5e7eb)] pb-2 mb-3">Office Info</h3>
-
+        
         <div>
           <p class="text-xs text-[var(--tg-theme-hint-color,#6b7280)] uppercase tracking-wider mb-1">SND Office</p>
           <p class="font-semibold text-[var(--tg-theme-text-color,#111827)]">{{ info.sndOffice || 'N/A' }}</p>
@@ -183,10 +184,12 @@ export class MeterInfoComponent {
   @Input() isLoading: boolean = false;
 
   getBalanceAmount(): number {
+    if (this.info?.remainingBalance === 'Offline') return 999; // Ignore offline for state
     return parseFloat(this.info?.remainingBalance) || 0;
   }
 
-  getBalanceState(): 'normal' | 'low' | 'negative' {
+  getBalanceState(): 'normal' | 'low' | 'negative' | 'offline' {
+    if (this.info?.remainingBalance === 'Offline') return 'offline';
     if (this.info?.remainingBalance === undefined || this.info?.remainingBalance === null) return 'normal';
     const bal = this.getBalanceAmount();
     if (bal < 0) return 'negative';
@@ -196,6 +199,9 @@ export class MeterInfoComponent {
 
   getCardClasses(): string {
     const state = this.getBalanceState();
+    if (state === 'offline') {
+      return 'from-gray-500 to-gray-600 shadow-gray-500/30';
+    }
     if (state === 'negative') {
       return 'from-red-500 to-red-600 shadow-red-500/30 ring-2 ring-red-300 dark:ring-red-900';
     }
