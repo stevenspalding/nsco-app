@@ -37,14 +37,12 @@ import { AdminService } from '../../services/admin.service';
 
         <!-- Tab Selectors -->
         <div class="flex space-x-1 bg-gray-200/50 p-1 rounded-xl mb-8 w-fit border border-gray-200">
-          <button (click)="activeTab = 'users'" [class.bg-white]="activeTab === 'users'" [class.shadow-sm]="activeTab === 'users'" [class.text-gray-500]="activeTab !== 'users'"
-                  class="px-5 py-2.5 rounded-lg text-sm font-bold transition-all">
+          <button class="bg-white shadow-sm px-5 py-2.5 rounded-lg text-sm font-bold transition-all text-gray-900 cursor-default">
             System Overview
           </button>
-          <button (click)="activeTab = 'live'" [class.bg-white]="activeTab === 'live'" [class.shadow-sm]="activeTab === 'live'" [class.text-gray-500]="activeTab !== 'live'"
-                  class="px-5 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center">
+          <button (click)="goToLiveCheck()" class="text-gray-500 hover:bg-white hover:shadow-sm px-5 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center">
             <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-            Live Check
+            Full Diagnostic Check
           </button>
         </div>
 
@@ -54,7 +52,7 @@ import { AdminService } from '../../services/admin.service';
         </div>
 
         <!-- TAB: SYSTEM OVERVIEW -->
-        <div *ngIf="!isLoading && activeTab === 'users'" class="space-y-8 animate-fade-in">
+        <div *ngIf="!isLoading" class="space-y-8 animate-fade-in">
 
           <!-- Quick Stats -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -127,68 +125,6 @@ import { AdminService } from '../../services/admin.service';
           </div>
         </div>
 
-        <!-- TAB: LIVE CHECK -->
-        <div *ngIf="!isLoading && activeTab === 'live'" class="max-w-2xl mx-auto space-y-6 animate-fade-in">
-
-          <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm text-center">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Live Scraper Check</h3>
-            <p class="text-sm text-gray-500 mb-6">Fetch current meter details from NESCO without saving to the database.</p>
-
-            <div class="flex space-x-3">
-              <input type="number" [(ngModel)]="liveCheckId" placeholder="Enter Consumer ID"
-                     class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors font-mono font-bold text-lg">
-              <button (click)="runLiveCheck()" [disabled]="isChecking"
-                      class="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-50 flex items-center">
-                <span *ngIf="!isChecking">Check</span>
-                <svg *ngIf="isChecking" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-              </button>
-            </div>
-
-            <div *ngIf="liveCheckError" class="mt-4 text-sm font-bold text-red-500 bg-red-50 py-2 rounded-lg border border-red-100">
-              {{ liveCheckError }}
-            </div>
-          </div>
-
-          <!-- Live Check Result -->
-          <div *ngIf="liveResult" class="bg-white p-6 rounded-2xl border border-blue-200 shadow-lg shadow-blue-500/10">
-            <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
-              <div>
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Customer Name</p>
-                <p class="text-xl font-black text-gray-900">{{ liveResult.customerInfo?.customerName || 'N/A' }}</p>
-              </div>
-              <div class="text-right">
-                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Current Balance</p>
-                <p class="text-2xl font-black text-blue-600">৳{{ liveResult.customerInfo?.remainingBalance || '0.00' }}</p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p class="text-gray-500">Meter Number</p>
-                <p class="font-mono font-bold text-gray-900">{{ liveResult.customerInfo?.meterNo || 'N/A' }}</p>
-              </div>
-              <div class="text-right">
-                <p class="text-gray-500">Meter Status</p>
-                <p class="font-bold text-green-600">{{ liveResult.customerInfo?.meterStatus || 'N/A' }}</p>
-              </div>
-              <div>
-                <p class="text-gray-500">SND Office</p>
-                <p class="font-bold text-gray-900">{{ liveResult.customerInfo?.sndOffice || 'N/A' }}</p>
-              </div>
-              <div class="text-right">
-                <p class="text-gray-500">Mobile</p>
-                <p class="font-bold text-gray-900">{{ liveResult.customerInfo?.mobile || 'N/A' }}</p>
-              </div>
-            </div>
-
-            <div class="mt-6 bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
-              <p class="text-xs text-gray-500">Last Updated on NESCO Server</p>
-              <p class="font-bold text-gray-900 mt-1">{{ liveResult.customerInfo?.balanceUpdateTime || 'Unknown' }}</p>
-            </div>
-          </div>
-
-        </div>
-
       </div>
     </div>
   `,
@@ -198,18 +134,12 @@ import { AdminService } from '../../services/admin.service';
   `]
 })
 export class AdminDashboardComponent implements OnInit {
-  activeTab: 'users' | 'live' = 'users';
   isLoading = true;
 
   subscribers: any[] = [];
   accounts: any[] = [];
 
   newMeterMap: { [chatId: string]: string } = {};
-
-  liveCheckId = '';
-  isChecking = false;
-  liveResult: any = null;
-  liveCheckError = '';
 
   constructor(private adminService: AdminService, private router: Router) { }
 
@@ -275,22 +205,8 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  runLiveCheck() {
-    if (!this.liveCheckId) return;
-    this.isChecking = true;
-    this.liveCheckError = '';
-    this.liveResult = null;
-
-    this.adminService.liveCheck(this.liveCheckId).subscribe({
-      next: (res) => {
-        this.liveResult = res.data;
-        this.isChecking = false;
-      },
-      error: (err) => {
-        this.liveCheckError = err.error?.error || 'Invalid ID or Server Offline';
-        this.isChecking = false;
-      }
-    });
+  goToLiveCheck() {
+    this.router.navigate(['/admin/live-check']);
   }
 
   logout() {
