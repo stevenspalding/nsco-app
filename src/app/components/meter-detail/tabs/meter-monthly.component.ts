@@ -333,9 +333,9 @@ export class MeterMonthlyComponent {
             callbacks: {
               label: (context) => {
                 if (context.datasetIndex === 0) {
-                  return ` Cost: ৳ ${context.parsed.y?.toLocaleString()}`;
-                } else {
                   return ` Usage: ${context.parsed.y?.toLocaleString()} kWh`;
+                } else {
+                  return ` Cost: ৳ ${context.parsed.y?.toLocaleString()}`;
                 }
               }
             }
